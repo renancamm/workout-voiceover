@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Workout Voiceover</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="jumbotron">
+          <h1>Workout Voiceover</h1>
+          <hr>
+          <div class="form-group">
+            <label for="preparationTime">Preparation</label>
+            <select class="form-control form-control-lg" id="preparation">
+              <option value="1">Wait 1 second before start</option>
+              <option value="2">Wait 2 seconds before start</option>
+              <option value="3">Wait 3 seconds before start</option>
+              <option value="4">Wait 4 seconds before start</option>
+              <option value="5" selected>Wait 5 seconds before start</option>
+              <option value="6">Wait 6 seconds before start</option>
+              <option value="7">Wait 7 seconds before start</option>
+              <option value="8">Wait 8 seconds before start</option>
+              <option value="9">Wait 9 seconds before start</option>
+              <option value="10">Wait 10 seconds before start</option>
+            </select>
+          </div>
+          <label for="repetitions">Repetitions</label>
+          <div class="form-row">
+            <div class="form-group col-6">
+              <select class="form-control form-control-lg" id="repetitions">
+                <option value="1">1 times</option>
+                <option value="2">2 times</option>
+                <option value="3">3 times</option>
+                <option value="4">4 times</option>
+                <option value="5" selected>5 times</option>
+                <option value="6">6 times</option>
+                <option value="7">7 times</option>
+                <option value="8">8 times</option>
+                <option value="9">9 times</option>
+                <option value="10">10 times</option>
+              </select>
+            </div>
+            <div class="form-group col-6">
+              <select class="form-control form-control-lg" id="repetitionLenght">
+                <option value="1">1 seconds each</option>
+                <option value="2">2 seconds each</option>
+                <option value="3">3 seconds each</option>
+                <option value="4">4 seconds each</option>
+                <option value="5" selected>5 seconds each</option>
+                <option value="6">6 seconds each</option>
+                <option value="7">7 seconds each</option>
+                <option value="8">8 seconds each</option>
+                <option value="9">9 seconds each</option>
+                <option value="10">10 second each</option>
+              </select>
+            </div>
+          </div>
+          <label for="sets">Sets</label>
+          <div class="form-row">
+            <div class="form-group col-6">
+              <div class="form-group">
+                <select class="form-control form-control-lg" id="sets">
+                  <option value="1">1 sets of repetitions</option>
+                  <option value="2">2 sets of repetitions</option>
+                  <option value="3" selected>3 sets of repetitions</option>
+                  <option value="4">4 sets of repetitions</option>
+                  <option value="5">5 sets of repetitions</option>
+                  <option value="6">6 sets of repetitions</option>
+                  <option value="7">7 sets of repetitions</option>
+                  <option value="8">8 sets of repetitions</option>
+                  <option value="9">9 sets of repetitions</option>
+                  <option value="10">10 sets of repetitions</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group col-6">
+              <div class="form-group">
+                <select class="form-control form-control-lg" id="setCooldown">
+                  <option value="1">1 seconds of cooldown</option>
+                  <option value="2">2 seconds of cooldown</option>
+                  <option value="3">3 seconds of cooldown</option>
+                  <option value="4">4 seconds of cooldown</option>
+                  <option value="5">5 seconds of cooldown</option>
+                  <option value="6">6 seconds of cooldown</option>
+                  <option value="7">7 seconds of cooldown</option>
+                  <option value="8">8 seconds of cooldown</option>
+                  <option value="9">9 seconds of cooldown</option>
+                  <option value="10" selected>10 seconds of cooldown</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <hr>
+          
+          <div class="display-4">
+          <div class="row">
+            <div class="col" id="preparationTimer">-s</div>
+            <div class="col"></div>
+          </div>
+          <div class="row">
+            <div class="col" id="repetitionLenghtTimer">-s</div>
+            <div class="col" id="repetitionsDisplay">-/-</div>
+          </div>
+          <div class="row">
+            <div class="col" id="setCooldownTimer">-s</div>
+            <div class="col" id="setsDisplay">-/-</div>
+          </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block mt-4" id="startButton">Start</button>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    var preparation, repetitions, repetitionLenght, sets, setCooldown;
+    var preparationTick, repetitionLenghtTick, setCooldownTick;
+    var repetitionStep, setStep;
+    var timer;
+
+    function startWorkout() {
+      //Get parameters from selects
+      preparation = document.getElementById("preparation").value;
+      repetitions = document.getElementById("repetitions").value;
+      repetitionLenght = document.getElementById("repetitionLenght").value;
+      sets = document.getElementById("sets").value;
+      setCooldown = document.getElementById("setCooldown").value;
+
+      //Init decremental timers
+      preparationTick = preparation;
+      repetitionLenghtTick = repetitionLenght;
+      setCooldownTick = setCooldown;
+
+      //Init incremental steps
+      repetitionStep = 0;
+      setStep = 0;
+
+      //Kickoff timers
+      tickWorkout();
+    }
+
+    function tickWorkout() {
+      updateDisplay();
+
+      //Preparation is over?
+      if (preparationTick == 0) {
+        //Sets are over?
+        if (setStep == sets) {
+          console.log("sets is over");
+          return
+        } else {
+          //Repetitions are over?
+          if (repetitionStep == repetitions) {
+            if (setCooldownTick == 0) {
+            //Step up set on zero
+            setStep += 1;
+            repetitionStep = 0;
+            resetTimer("setCooldownTick", "setCooldown");
+            resetTimer("repetitionLenghtTick", "repetitionLenght");
+            tickTimer("repetitionLenghtTick");
+
+            } else {
+              tickTimer("setCooldownTick");
+            }
+
+          } else {
+            if (repetitionLenghtTick == 0) {
+              //Step up repetition on zero
+              repetitionStep += 1;
+              resetTimer("repetitionLenghtTick", "repetitionLenght");
+              tickTimer("repetitionLenghtTick");
+            } else {
+              tickTimer("repetitionLenghtTick");
+            }
+          }
+        }
+      } else {
+        tickTimer("preparationTick");
+      }
+    }
+
+    function updateDisplay() {
+      document.getElementById("preparationTimer").innerHTML = preparationTick + "s";
+      document.getElementById("repetitionLenghtTimer").innerHTML = repetitionLenghtTick + "s";
+      document.getElementById("setCooldownTimer").innerHTML = setCooldownTick + "s";
+      document.getElementById("repetitionsDisplay").innerHTML = repetitionStep + "/" + repetitions;
+      document.getElementById("setsDisplay").innerHTML = setStep + "/" + sets;
+    }
+
+    function tickTimer(timer) {
+      window[timer] -= 1;
+      timeout = setTimeout(tickWorkout, 1000);
+    }
+
+    function resetTimer(timer, timerTotal) {
+      window[timer] = window[timerTotal];
+    }
+
+
+    window.addEventListener('load', function () {
+      document.getElementById("startButton").addEventListener('click', function () {
+        startWorkout();
+      });
+    });
+
+  </script>
+</body>
+
+</html>
