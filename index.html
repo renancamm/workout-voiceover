@@ -169,6 +169,12 @@
     var repetitionStep, setStep;
     var timer;
 
+    var audioTick = new Audio("tick.mp3");
+    var audioBlop = new Audio("blop.mp3");
+    var audioDing = new Audio("ding.mp3");
+    var audioSuccess = new Audio("success.mp3");
+
+
     function startWorkout() {
       //Get parameters from selects
       preparation = document.getElementById("preparation").value;
@@ -197,14 +203,14 @@
       if (preparationTick == 0) {
         //Sets are over?
         if (setStep == sets) {
-          console.log("sets is over");
-          return
+          audioSuccess.play();
         } else {
           //Repetitions are over?
           if (repetitionStep == repetitions) {
             if (setCooldownTick == 0) {
             //Step up set on zero
             setStep += 1;
+            audioDing.play();
             repetitionStep = 0;
             resetTimer("setCooldownTick", "setCooldown");
             resetTimer("repetitionLenghtTick", "repetitionLenght");
@@ -218,9 +224,11 @@
             if (repetitionLenghtTick == 0) {
               //Step up repetition on zero
               repetitionStep += 1;
+              audioBlop.play();
               resetTimer("repetitionLenghtTick", "repetitionLenght");
               tickTimer("repetitionLenghtTick");
             } else {
+              audioTick.play();
               tickTimer("repetitionLenghtTick");
             }
           }
