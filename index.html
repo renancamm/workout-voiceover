@@ -138,24 +138,30 @@
             </div>
           </div>
           <hr>
-          
+
           <div class="display-4">
-          <div class="row">
-            <div class="col" id="preparationTimer">-s</div>
-            <div class="col"></div>
+            <div class="row">
+              <div class="col" id="preparationTimer">-s</div>
+              <div class="col"></div>
+            </div>
+            <div class="row">
+              <div class="col" id="repetitionLenghtTimer">-s</div>
+              <div class="col" id="repetitionsDisplay">-/-</div>
+            </div>
+            <div class="row">
+              <div class="col" id="setCooldownTimer">-s</div>
+              <div class="col" id="setsDisplay">-/-</div>
+            </div>
           </div>
-          <div class="row">
-            <div class="col" id="repetitionLenghtTimer">-s</div>
-            <div class="col" id="repetitionsDisplay">-/-</div>
+          <div class="form-row mt-5">
+            <div class=col>
+                <button class="btn btn-secondary btn-lg btn-block" id="resetButton">Reset</button>
+            </div>
+            <div class=col>
+                <button class="btn btn-primary btn-lg btn-block" id="startButton">Start</button>
+            </div>
+          
           </div>
-          <div class="row">
-            <div class="col" id="setCooldownTimer">-s</div>
-            <div class="col" id="setsDisplay">-/-</div>
-          </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-lg btn-block mt-4" id="startButton">Start</button>
-
 
         </div>
       </div>
@@ -164,10 +170,11 @@
 
 
   <script>
+    var workoutRunning = false;
     var preparation, repetitions, repetitionLenght, sets, setCooldown;
     var preparationTick, repetitionLenghtTick, setCooldownTick;
     var repetitionStep, setStep;
-    var timer;
+    var timeout;
 
     var audioTick = new Audio("tick.mp3");
     var audioBlop = new Audio("blop.mp3");
@@ -176,29 +183,33 @@
 
 
     function startWorkout() {
-      //Get parameters from selects
-      preparation = document.getElementById("preparation").value;
-      repetitions = document.getElementById("repetitions").value;
-      repetitionLenght = document.getElementById("repetitionLenght").value;
-      sets = document.getElementById("sets").value;
-      setCooldown = document.getElementById("setCooldown").value;
+      if (workoutRunning == false) {
+        //Get parameters from selects
+        preparation = document.getElementById("preparation").value;
+        repetitions = document.getElementById("repetitions").value;
+        repetitionLenght = document.getElementById("repetitionLenght").value;
+        sets = document.getElementById("sets").value;
+        setCooldown = document.getElementById("setCooldown").value;
 
-      //Init decremental timers
-      preparationTick = preparation;
-      repetitionLenghtTick = repetitionLenght;
-      setCooldownTick = setCooldown;
+        //Init decremental timers
+        preparationTick = preparation;
+        repetitionLenghtTick = repetitionLenght;
+        setCooldownTick = setCooldown;
 
-      //Init incremental steps
-      repetitionStep = 0;
-      setStep = 0;
+        //Init incremental steps
+        repetitionStep = 0;
+        setStep = 0;
 
-      //Kickoff timers
-      tickWorkout();
+        //Kickoff timers
+        workoutRunning = true;
+        tickWorkout();
+      } else {
+        //pause?
+      }
     }
 
     function tickWorkout() {
       updateDisplay();
-
       //Preparation is over?
       if (preparationTick == 0) {
         //Sets are over?
@@ -208,18 +219,16 @@
           //Repetitions are over?
           if (repetitionStep == repetitions) {
             if (setCooldownTick == 0) {
-            //Step up set on zero
-            setStep += 1;
-            audioDing.play();
-            repetitionStep = 0;
-            resetTimer("setCooldownTick", "setCooldown");
-            resetTimer("repetitionLenghtTick", "repetitionLenght");
-            tickTimer("repetitionLenghtTick");
-
+              //Step up set on zero
+              setStep += 1;
+              audioDing.play();
+              repetitionStep = 0;
+              resetTimer("setCooldownTick", "setCooldown");
+              resetTimer("repetitionLenghtTick", "repetitionLenght");
+              tickTimer("repetitionLenghtTick");
             } else {
               tickTimer("setCooldownTick");
             }
-
           } else {
             if (repetitionLenghtTick == 0) {
               //Step up repetition on zero
@@ -245,7 +254,7 @@
       document.getElementById("repetitionsDisplay").innerHTML = repetitionStep + "/" + repetitions;
       document.getElementById("setsDisplay").innerHTML = setStep + "/" + sets;
     }
-
+  
     function tickTimer(timer) {
       window[timer] -= 1;
       timeout = setTimeout(tickWorkout, 1000);
@@ -255,10 +264,25 @@
       window[timer] = window[timerTotal];
     }
 
+    function resetWorkout() {
+      clearTimeout(timeout);
+      preparationTick = "-";
+      repetitionLenghtTick = "-";
+      setCooldownTick = "-";
+      repetitionStep = "-";
+      repetitions = "-";
+      setStep = "-";
+      sets = "-";
+      updateDisplay();
+      workoutRunning = false;
+    }
 
     window.addEventListener('load', function () {
       document.getElementById("startButton").addEventListener('click', function () {
         startWorkout();
+      });
+      document.getElementById("resetButton").addEventListener('click', function () {
+        resetWorkout();
       });
     });
 
